@@ -16,8 +16,9 @@ namespace ReadExcelOpenXml
             try
             {
                 // Path to the Excel file
-                string filePath = @"C:\Users\rijoan\Downloads\JFK Electric, LLC 401(k) Plan_CensusDataImport_09.30.2024.xlsm";
+                //string filePath = @"C:\Users\rijoan\Downloads\JFK Electric, LLC 401(k) Plan_CensusDataImport_09.30.2024.xlsm";
                 //string filePath = @"C:\Users\rijoan\Downloads\Cangelose Financial, LLC 401(k) Plan_CensusDataImport_12.31.2024.xlsm";
+                string filePath = @"C:\Users\rijoan\Desktop\Archive\Files\Admin_Division.xlsm";
 
                 // Read the Excel file into a DataTable
                 var excelReader = new ReadExcelWithOpenXml();
@@ -25,9 +26,10 @@ namespace ReadExcelOpenXml
 
                 // Generate table name (e.g., based on file name)
                 var tableName = Path.GetFileNameWithoutExtension(filePath);
-                tableName = Regex.Replace(tableName, @"[ .(),]", "");
+                tableName = Regex.Replace(tableName, @"[ .(),] '", "");
 
                 // Initialize services
+                //var connectionString = "Server=testsql1.julyservices.local;Database=TPAManager_Test;User ID=report;Password=brlWOyuz07Rljof#e!ug;Integrated Security=true;TrustServerCertificate=True;";
                 var connectionString = "Server=SWD-RIJOAN-L;Database=TestDB;User ID=jahangir;Password=Baylor123;Integrated Security=true;TrustServerCertificate=True;";
                 var sqlGenerator = new SqlTableGenerator();
                 var dbService = new DatabaseService(connectionString);
@@ -75,121 +77,6 @@ namespace ReadExcelOpenXml
             }
         }
 
-        ////public static DataTable ReadExcelWithOpenXml(string filePath)
-        ////{
-        ////    var dataTable = new DataTable();
-
-        ////    // Open the Excel file
-        ////    using (SpreadsheetDocument document = SpreadsheetDocument.Open(filePath, false))
-        ////    {
-        ////        WorkbookPart workbookPart = document.WorkbookPart;
-        ////        Sheet sheet = workbookPart.Workbook.Sheets.Elements<Sheet>().FirstOrDefault();
-
-        ////        if (sheet == null)
-        ////        {
-        ////            throw new Exception("No sheets found in the Excel file.");
-        ////        }
-
-        ////        WorksheetPart worksheetPart = (WorksheetPart)workbookPart.GetPartById(sheet.Id);
-        ////        SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().First();
-
-        ////        // Add columns to DataTable based on the first two header rows
-        ////        var headerRows = sheetData.Elements<Row>().Take(2).ToList();
-        ////        if (headerRows.Count < 2)
-        ////        {
-        ////            throw new Exception("Not enough header rows found in the Excel sheet.");
-        ////        }
-
-        ////        // Determine the maximum number of columns in the header rows
-        ////        int maxColumnIndex = headerRows.SelectMany(row => row.Elements<Cell>())
-        ////                                       .Max(cell => GetColumnIndex(cell.CellReference));
-
-        ////        for (int colIndex = 0; colIndex <= maxColumnIndex; colIndex++)
-        ////        {
-        ////            string firstHeader = GetCellValue(document, headerRows[0].Elements<Cell>().FirstOrDefault(c => GetColumnIndex(c.CellReference) == colIndex));
-        ////            string secondHeader = GetCellValue(document, headerRows[1].Elements<Cell>().FirstOrDefault(c => GetColumnIndex(c.CellReference) == colIndex));
-
-        ////            // Combine the headers, using a space if either is null
-        ////            string combinedHeader = $"{firstHeader ?? string.Empty} {secondHeader ?? string.Empty}".Trim();
-        ////            if (string.IsNullOrEmpty(combinedHeader))
-        ////            {
-        ////                combinedHeader = $"Column{dataTable.Columns.Count + 1}"; // Default column name if combined header is empty
-        ////            }
-        ////            dataTable.Columns.Add(combinedHeader);
-        ////        }
-
-        ////        // Get merged cells information
-        ////        var mergeCells = worksheetPart.Worksheet.Elements<MergeCells>().FirstOrDefault();
-
-        ////        // Add rows to DataTable, skipping the first two header rows
-        ////        foreach (Row row in sheetData.Elements<Row>().Skip(2))
-        ////        {
-        ////            var dataRow = dataTable.NewRow();
-        ////            int columnIndex = 0;
-
-        ////            foreach (Cell cell in row.Elements<Cell>())
-        ////            {
-        ////                // Get the column index of the cell
-        ////                int cellColumnIndex = GetColumnIndex(cell.CellReference);
-
-        ////                // Ensure the column index is within the bounds of the DataTable
-        ////                if (cellColumnIndex >= dataTable.Columns.Count)
-        ////                {
-        ////                    continue;
-        ////                }
-
-        ////                // Fill in any missing columns with empty values
-        ////                while (columnIndex < cellColumnIndex)
-        ////                {
-        ////                    dataRow[columnIndex] = string.Empty;
-        ////                    columnIndex++;
-        ////                }
-
-        ////                // Get the cell value
-        ////                string cellValue = GetCellValue(document, cell);
-        ////                dataRow[columnIndex] = cellValue ?? string.Empty;
-        ////                columnIndex++;
-        ////            }
-
-        ////            // Ensure the DataRow has the same number of columns as the DataTable
-        ////            while (columnIndex < dataTable.Columns.Count)
-        ////            {
-        ////                dataRow[columnIndex] = string.Empty;
-        ////                columnIndex++;
-        ////            }
-
-        ////            dataTable.Rows.Add(dataRow);
-        ////        }
-
-        ////        // Handle merged cells
-        ////        if (mergeCells != null)
-        ////        {
-        ////            foreach (MergeCell mergeCell in mergeCells.Elements<MergeCell>())
-        ////            {
-        ////                string[] cellRange = mergeCell.Reference.Value.Split(':');
-        ////                string startCell = cellRange[0];
-        ////                string endCell = cellRange[1];
-
-        ////                int startColumnIndex = GetColumnIndex(startCell);
-        ////                int endColumnIndex = GetColumnIndex(endCell);
-        ////                int startRowIndex = GetRowIndex(startCell);
-        ////                int endRowIndex = GetRowIndex(endCell);
-
-        ////                string mergedValue = dataTable.Rows[startRowIndex - 1][startColumnIndex].ToString();
-
-        ////                for (int rowIndex = startRowIndex - 1; rowIndex < endRowIndex; rowIndex++)
-        ////                {
-        ////                    for (int colIndex = startColumnIndex; colIndex <= endColumnIndex; colIndex++)
-        ////                    {
-        ////                        dataTable.Rows[rowIndex][colIndex] = mergedValue;
-        ////                    }
-        ////                }
-        ////            }
-        ////        }
-        ////    }
-
-        ////    return dataTable;
-        ////}
 
         private static string GetCellValue(SpreadsheetDocument document, Cell cell)
         {

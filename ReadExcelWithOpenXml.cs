@@ -31,8 +31,8 @@ namespace ExcelReaderApp
                 SheetData sheetData = worksheetPart.Worksheet.Elements<SheetData>().First();
 
                 // Add columns to DataTable based on the first two header rows
-                var headerRows = sheetData.Elements<Row>().Take(2).ToList();
-                if (headerRows.Count < 2)
+                var headerRows = sheetData.Elements<Row>().Take(8).ToList();
+                if (headerRows.Count < 8)
                 {
                     throw new Exception("Not enough header rows found in the Excel sheet.");
                 }
@@ -134,8 +134,6 @@ namespace ExcelReaderApp
                 dataTable.AcceptChanges();
             }
 
-            
-
             // Merge the values of the first two rows to create new column names
             var columnNames = new Dictionary<string, int>();
             string previousColumnName = string.Empty;
@@ -150,12 +148,21 @@ namespace ExcelReaderApp
 
                 // Use regular expression to replace unwanted characters
                 string newColumnName = $"{value1}{value2}";
-                newColumnName = Regex.Replace(newColumnName, @"[ \-\/\?]", "");
+                newColumnName = Regex.Replace(newColumnName, @"[ \-\/\?']", "");
 
                 // Handle the special case for "Enter Your Records Here (if different)"
                 if (value2.Contains("Enter Your Records Here (if different)"))
                 {
-                    newColumnName = $"{Regex.Replace(value1, @"[ \-\/\?]", "_")}Client";
+                    string previousValue1 = dataTable.Rows[0][i - 1] != DBNull.Value ? dataTable.Rows[0][i - 1].ToString().Trim() : "";
+                    previousValue1 = Regex.Replace(previousValue1, @"[ \-\/\?']", "");
+                    newColumnName = $"{previousValue1}_Client";
+                    value2 = newColumnName;
+                }
+                else if (value2.Contains("Enter Your Records Here"))
+                {
+                    string previousValue1 = dataTable.Rows[0][i - 1] != DBNull.Value ? $"{value1}" : "";
+                    previousValue1 = Regex.Replace(previousValue1, @"[ \-\/\?']", "");
+                    newColumnName = $"{previousValue1}_Client";
                 }
 
                 // Check for duplicate column names and append a unique identifier if necessary
@@ -178,19 +185,6 @@ namespace ExcelReaderApp
             dataTable.Rows[1].Delete();
             dataTable.AcceptChanges();
 
-            ////// Merge the values of the first two rows to create new column names
-            ////for (int i = 0; i < dataTable.Columns.Count; i++)
-            ////{
-            ////    string value1 = dataTable.Rows[0][i] != DBNull.Value ? dataTable.Rows[0][i].ToString().Trim() : "";
-            ////    string value2 = dataTable.Rows[1][i] != DBNull.Value ? dataTable.Rows[1][i].ToString().Trim() : $"col{i}";
-            ////    string newColumnName = $"{value1}{value2}".Replace(" ", "").Replace("-", "_").Replace("/", "_").Replace("EnterYourRecordsHere", "_User");
-            ////    dataTable.Columns[i].ColumnName = newColumnName;
-            ////}
-
-            ////// Remove the first two rows as they are now used as column names
-            ////dataTable.Rows[0].Delete();
-            ////dataTable.Rows[1].Delete();
-            ////dataTable.AcceptChanges();
 
             return dataTable;
         }
