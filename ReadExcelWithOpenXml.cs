@@ -134,6 +134,8 @@ namespace ExcelReaderApp
                 dataTable.AcceptChanges();
             }
 
+            
+
             // Merge the values of the first two rows to create new column names
             var columnNames = new Dictionary<string, int>();
             string previousColumnName = string.Empty;
@@ -185,6 +187,19 @@ namespace ExcelReaderApp
             dataTable.Rows[1].Delete();
             dataTable.AcceptChanges();
 
+            ////// Merge the values of the first two rows to create new column names
+            ////for (int i = 0; i < dataTable.Columns.Count; i++)
+            ////{
+            ////    string value1 = dataTable.Rows[0][i] != DBNull.Value ? dataTable.Rows[0][i].ToString().Trim() : "";
+            ////    string value2 = dataTable.Rows[1][i] != DBNull.Value ? dataTable.Rows[1][i].ToString().Trim() : $"col{i}";
+            ////    string newColumnName = $"{value1}{value2}".Replace(" ", "").Replace("-", "_").Replace("/", "_").Replace("EnterYourRecordsHere", "_User");
+            ////    dataTable.Columns[i].ColumnName = newColumnName;
+            ////}
+
+            ////// Remove the first two rows as they are now used as column names
+            ////dataTable.Rows[0].Delete();
+            ////dataTable.Rows[1].Delete();
+            ////dataTable.AcceptChanges();
 
             return dataTable;
         }

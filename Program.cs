@@ -16,7 +16,6 @@ namespace ReadExcelOpenXml
             try
             {
                 // Path to the Excel file
-                //string filePath = @"C:\Users\rijoan\Downloads\JFK Electric, LLC 401(k) Plan_CensusDataImport_09.30.2024.xlsm";
                 //string filePath = @"C:\Users\rijoan\Downloads\Cangelose Financial, LLC 401(k) Plan_CensusDataImport_12.31.2024.xlsm";
                 string filePath = @"C:\Users\rijoan\Desktop\Archive\Files\Admin_Division.xlsm";
 
@@ -26,7 +25,6 @@ namespace ReadExcelOpenXml
 
                 // Generate table name (e.g., based on file name)
                 var tableName = Path.GetFileNameWithoutExtension(filePath);
-                tableName = Regex.Replace(tableName, @"[ .(),] '", "");
 
                 // Initialize services
                 //var connectionString = "Server=testsql1.julyservices.local;Database=TPAManager_Test;User ID=report;Password=brlWOyuz07Rljof#e!ug;Integrated Security=true;TrustServerCertificate=True;";
